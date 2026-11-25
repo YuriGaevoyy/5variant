@@ -48,3 +48,7 @@ dotnet run -c Release --project tools/DeliveryService.Benchmarks/DeliveryService
 - `docs/test-cases.md`, `docs/api-tests.md`, `docs/ui-checklist.md`, `docs/ui-scenarios.md` — тестирование.
 - `docs/works-log.md` — список работ 1–29 с подтверждениями.
 - `docs/user-guide.md` — руководство пользователя.
+
+## Правила работы с ветками
+
+Упрощённый Git Flow: `main` — выпуски, `develop` — интеграция, `feature/<N>-*` и `fix/<N>-*` — разработка, `release/<версия>` — подготовка выпуска. PR в `develop` содержит `Closes #N`.
