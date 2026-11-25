@@ -1,3 +1,4 @@
+# Упрощённый Git Flow: PR в develop, выпуски из release/* в main
 name: CI
 
 on:
