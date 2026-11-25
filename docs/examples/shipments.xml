@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shipments>
+  <shipment number="DLV-000001">
+    <recipient>Ирина Волкова</recipient>
+    <phone>+79000001201</phone>
+    <address>ул. Ленина, 12</address>
+    <description>Документы</description>
+    <weightKg>1.20</weightKg>
+    <amount>1500.00</amount>
+    <courier>курьер1</courier>
+    <status>Доставлено</status>
+    <createdAt>2026-11-20T09:15:00Z</createdAt>
+    <deliveredAt>2026-11-21T14:40:00Z</deliveredAt>
+    <confirmation>Получено И. Волковой</confirmation>
+    <returnReason></returnReason>
+  </shipment>
+  <shipment number="DLV-000002">
+    <recipient>Павел Морозов</recipient>
+    <phone>+79000001202</phone>
+    <address>пр. Мира, 7</address>
+    <description>Посылка</description>
+    <weightKg>2.50</weightKg>
+    <amount>3200.00</amount>
+    <courier>курьер2</courier>
+    <status>В пути</status>
+    <createdAt>2026-11-22T11:05:00Z</createdAt>
+    <deliveredAt></deliveredAt>
+    <confirmation></confirmation>
+    <returnReason></returnReason>
+  </shipment>
+</shipments>

@@ -1,0 +1,119 @@
+@baseUrl = https://localhost:7135
+@token = {{login.response.body.token}}
+
+### 1. Вход администратора — 200
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "login": "admin",
+  "password": "Admin@2026!"
+}
+
+### 2. Ошибочный пароль — 401
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "login": "admin",
+  "password": "wrong-password"
+}
+
+### 3. Список без токена — 401
+GET {{baseUrl}}/api/shipments
+
+### 4. Список отправлений администратора — 200
+GET {{baseUrl}}/api/shipments
+Authorization: Bearer {{token}}
+
+### 5. Поиск и фильтр по этапу — 200
+GET {{baseUrl}}/api/shipments?status=InTransit&search=Тверская
+Authorization: Bearer {{token}}
+
+### 6. Карточка отправления — 200
+GET {{baseUrl}}/api/shipments/1
+Authorization: Bearer {{token}}
+
+### 7. Несуществующая карточка — 404
+GET {{baseUrl}}/api/shipments/99999
+Authorization: Bearer {{token}}
+
+### 8. Статистика — 200
+GET {{baseUrl}}/api/statistics
+Authorization: Bearer {{token}}
+
+### 9. Создание отправления — 201
+POST {{baseUrl}}/api/shipments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "recipientId": 1,
+  "description": "Документы для получить",
+  "deliveryAddress": "ул. Тверская, 12",
+  "weightKg": 1.5,
+  "declaredAmount": 1500.00,
+  "courierId": 3,
+  "notes": "Доставить до 18:00"
+}
+
+### 10. Недопустимый переход из «Создано» в «Доставлено» — 400
+POST {{baseUrl}}/api/shipments/1/transition
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "Delivered",
+  "reason": null,
+  "confirmation": "Ирина",
+  "version": 1
+}
+
+### 11. Устаревшая версия — 409
+PUT {{baseUrl}}/api/shipments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "recipientId": 1,
+  "description": "Устаревшая правка",
+  "deliveryAddress": "ул. Тверская, 12",
+  "weightKg": 1.5,
+  "declaredAmount": 1500.00,
+  "courierId": 3,
+  "notes": "",
+  "version": 0
+}
+
+### 12. Оператор не видит пользователей — 403 (войдите оператором и подставьте его токен)
+# GET {{baseUrl}}/api/users
+# Authorization: Bearer <operator-token>
+
+### 13. Импорт получателей с ошибкой в строке 3 — 400
+POST {{baseUrl}}/api/recipients/import
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "csv": "Name,Phone,Address,Email\nИван,+79990000000,ул. Новая,ivan@example.test\n,123,ул. Старая,petr@example.test"
+}
+
+### 14. Выгрузка CSV — 200
+GET {{baseUrl}}/api/shipments/export?format=csv
+Authorization: Bearer {{token}}
+
+### 15. Выгрузка JSON — 200
+GET {{baseUrl}}/api/shipments/export?format=json
+Authorization: Bearer {{token}}
+
+### 16. Выгрузка XML — 200
+GET {{baseUrl}}/api/shipments/export?format=xml
+Authorization: Bearer {{token}}
+
+### 17. Проверка работоспособности — 200 (без токена)
+GET {{baseUrl}}/health
+
+### 18. Выход — 200 и отзыв токена
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{token}}

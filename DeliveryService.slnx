@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/requirements.md" />
+    <File Path="docs/architecture.md" />
+    <File Path="docs/artifacts.md" />
+    <File Path="docs/api-spec.md" />
+  </Folder>
+  <Folder Name="/Элементы решения/">
+    <File Path="README.md" />
+    <File Path="CHANGELOG.md" />
+  </Folder>
+  <Project Path="DeliveryService.Api/DeliveryService.Api.csproj" />
+  <Project Path="DeliveryService.Core/DeliveryService.Core.csproj" />
+  <Project Path="DeliveryService.Data/DeliveryService.Data.csproj" />
+  <Project Path="DeliveryService.Desktop/DeliveryService.Desktop.csproj" />
+  <Project Path="DeliveryService.Tests/DeliveryService.Tests.csproj" />
+  <Project Path="DeliveryService.UiTests/DeliveryService.UiTests.csproj" />
+</Solution>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" type="device" version="24.7.17" agent="CodeBuddy">
+  <diagram id="classes-up02-5" name="Модель данных">
+    <mxGraphModel dx="1280" dy="800" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1280" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="hdr" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#12263A;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1280" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="Модель данных" style="text;html=1;align=left;verticalAlign=middle;spacingLeft=40;fontSize=24;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="0" y="10" width="800" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Служба доставки · УП.02 вариант 5 · сущности, перечисления и связи" style="text;html=1;align=left;verticalAlign=middle;spacingLeft=42;fontSize=13;fontColor=#B6C8D9;" vertex="1" parent="1">
+          <mxGeometry x="0" y="50" width="1000" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ship_box" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#12263A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="180" width="310" height="252" as="geometry" />
+        </mxCell>
+        <mxCell id="ship_head" value="Shipment" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#12263A;strokeColor=none;fontSize=16;fontStyle=1;fontColor=#FFFFFF;verticalAlign=middle;spacingLeft=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="80" y="180" width="310" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="ship_body" value="Id: int&lt;br&gt;Number: string&lt;br&gt;Status: ShipmentStatus&lt;br&gt;CreatedAt: DateTime&lt;br&gt;WeightKg: decimal&lt;br&gt;RecipientId: int&lt;br&gt;CourierId: int?" style="text;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;fontSize=13;fontColor=#33465A;lineHeight=1.35;" vertex="1" parent="1">
+          <mxGeometry x="80" y="224" width="310" height="208" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rec_box" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#12263A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="540" y="180" width="280" height="168" as="geometry" />
+        </mxCell>
+        <mxCell id="rec_head" value="Recipient" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#254765;strokeColor=none;fontSize=16;fontStyle=1;fontColor=#FFFFFF;verticalAlign=middle;spacingLeft=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="540" y="180" width="280" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="rec_body" value="Id: int&lt;br&gt;FullName: string&lt;br&gt;Phone: string&lt;br&gt;Address: string" style="text;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;fontSize=13;fontColor=#33465A;lineHeight=1.35;" vertex="1" parent="1">
+          <mxGeometry x="540" y="224" width="280" height="124" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user_box" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#12263A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="540" y="460" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="user_head" value="AppUser (Courier)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#254765;strokeColor=none;fontSize=16;fontStyle=1;fontColor=#FFFFFF;verticalAlign=middle;spacingLeft=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="540" y="460" width="280" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="user_body" value="Id: int&lt;br&gt;Login: string&lt;br&gt;FullName: string&lt;br&gt;Role: UserRole&lt;br&gt;Phone: string" style="text;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;fontSize=13;fontColor=#33465A;lineHeight=1.35;" vertex="1" parent="1">
+          <mxGeometry x="540" y="504" width="280" height="156" as="geometry" />
+        </mxCell>
+
+        <mxCell id="st_box" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#12263A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="920" y="180" width="280" height="252" as="geometry" />
+        </mxCell>
+        <mxCell id="st_head" value="«enumeration» ShipmentStatus" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#12263A;strokeColor=none;fontSize=13;fontStyle=1;fontColor=#FFFFFF;verticalAlign=middle;spacingLeft=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="920" y="180" width="280" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="st_body" value="&lt;font color='#7A8798'&gt;Created&lt;/font&gt;&lt;br&gt;&lt;font color='#5E7490'&gt;Accepted&lt;/font&gt;&lt;br&gt;&lt;font color='#C77B0E'&gt;InTransit&lt;/font&gt;&lt;br&gt;&lt;font color='#0E765C'&gt;Delivered&lt;/font&gt;&lt;br&gt;&lt;font color='#9A6A6A'&gt;Returned&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;fontSize=14;fontStyle=1;lineHeight=1.45;" vertex="1" parent="1">
+          <mxGeometry x="920" y="224" width="280" height="208" as="geometry" />
+        </mxCell>
+
+        <mxCell id="role_box" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#12263A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="920" y="460" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="role_head" value="«enumeration» UserRole" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#12263A;strokeColor=none;fontSize=13;fontStyle=1;fontColor=#FFFFFF;verticalAlign=middle;spacingLeft=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="920" y="460" width="280" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="role_body" value="Admin&lt;br&gt;Operator&lt;br&gt;Courier" style="text;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=12;fontSize=14;fontStyle=1;fontColor=#33465A;lineHeight=1.45;" vertex="1" parent="1">
+          <mxGeometry x="920" y="504" width="280" height="156" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c1" value="1 : 1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#12263A;strokeWidth=2;startArrow=diamond;startFill=1;endArrow=none;fontSize=11;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.48;entryX=0;entryY=0.48;" edge="1" parent="1" source="ship_box" target="rec_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Courier (0..1)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#12263A;strokeWidth=2;dashed=1;startArrow=openDiamond;startFill=0;endArrow=none;fontSize=11;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.92;entryX=0;entryY=0.5;" edge="1" parent="1" source="ship_box" target="user_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Status" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6E7F91;strokeWidth=1;dashed=1;endArrow=open;endFill=0;fontSize=11;labelBackgroundColor=#FFFFFF;exitX=0.55;exitY=0;entryX=0.5;entryY=0;" edge="1" parent="1" source="ship_box" target="st_box">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="250" y="130" />
+              <mxPoint x="1060" y="130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c4" value="Role" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6E7F91;strokeWidth=1;dashed=1;endArrow=open;endFill=0;fontSize=11;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="user_box" target="role_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg" value="◆ композиция&amp;nbsp;&amp;nbsp;&amp;nbsp; ◇ необязательная связь&amp;nbsp;&amp;nbsp;&amp;nbsp; - - - зависимость от перечисления" style="text;html=1;align=left;verticalAlign=middle;spacingLeft=40;fontSize=12;fontColor=#4A5B6C;" vertex="1" parent="1">
+          <mxGeometry x="0" y="730" width="1000" height="34" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

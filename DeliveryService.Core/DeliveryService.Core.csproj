@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>DeliveryService.Core</AssemblyName>
+    <RootNamespace>DeliveryService.Core</RootNamespace>
+  </PropertyGroup>
+</Project>

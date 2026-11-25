@@ -1,0 +1,18 @@
+bin/
+obj/
+.vs/
+.workbuddy-ai/
+output/
+artifacts/*.zip
+Образец варианта 13/
+Промпт для WorkBuddy — вариант 5.md
+УП.02 — Методические указания по учебной практике.docx
+*.user
+*.db
+*.db-shm
+*.db-wal
+*.log
+logs/
+TestResults/
+coverage/
+*.coverage

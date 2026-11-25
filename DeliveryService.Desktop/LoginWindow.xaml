@@ -1,0 +1,93 @@
+<Window x:Class="DeliveryService.Desktop.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Служба доставки — вход" Width="900" Height="560" MinWidth="760" MinHeight="500"
+        WindowStartupLocation="CenterScreen" AutomationProperties.AutomationId="LoginWindow">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="1.05*"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <Border Grid.Column="0" Background="{StaticResource Navy}">
+      <Grid Margin="38,34">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+          <Border Width="42" Height="42" CornerRadius="12" Background="{StaticResource Amber}"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Path Data="M6,21 L17,10 L14,18 L24,18 L12,31 L15,22 Z" Fill="{StaticResource NavyDeep}"
+                  Stretch="Uniform" Margin="9" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel Margin="14,0,0,0">
+            <TextBlock Text="DS / LOGISTICS" Foreground="{StaticResource Amber}" FontSize="13"
+                       FontWeight="Bold"/>
+            <TextBlock Text="Служба доставки" Foreground="White" FontSize="25" FontWeight="SemiBold" Margin="0,2,0,0"/>
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+          <TextBlock Text="Отправление под контролем" Foreground="White" FontSize="34" FontWeight="SemiBold"
+                     TextWrapping="Wrap" Margin="0,0,0,16"/>
+          <TextBlock Text="От оформления до вручения: единый маршрут, понятные этапы и точная статистика."
+                     Foreground="#C7D7E6" FontSize="15" TextWrapping="Wrap" LineHeight="24"/>
+          <StackPanel Orientation="Horizontal" Margin="0,34,0,0">
+            <Border Background="#1D3B57" CornerRadius="18" Padding="12,7" Margin="0,0,7,0">
+              <TextBlock Text="01 Создано" Foreground="#DCE8F2" FontSize="12"/>
+            </Border>
+            <Border Background="#1D3B57" CornerRadius="18" Padding="12,7" Margin="0,0,7,0">
+              <TextBlock Text="02 Склад" Foreground="#DCE8F2" FontSize="12"/>
+            </Border>
+            <Border Background="{StaticResource Amber}" CornerRadius="18" Padding="12,7" Margin="0,0,7,0">
+              <TextBlock Text="03 В пути" Foreground="{StaticResource NavyDeep}" FontSize="12" FontWeight="SemiBold"/>
+            </Border>
+            <Border Background="#1D3B57" CornerRadius="18" Padding="12,7">
+              <TextBlock Text="04 Доставлено" Foreground="#DCE8F2" FontSize="12"/>
+            </Border>
+          </StackPanel>
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Text="Локальная версия · данные хранятся на этом компьютере"
+                   Foreground="#8FA8BD" FontSize="12"/>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Column="1" Background="{StaticResource Canvas}" Margin="0">
+      <Border Background="White" CornerRadius="16" Padding="42,38" Margin="34" VerticalAlignment="Center"
+              BorderBrush="{StaticResource Line}" BorderThickness="1">
+        <StackPanel>
+          <TextBlock Text="Вход в систему" FontSize="28" Foreground="{StaticResource Navy}" FontWeight="SemiBold"/>
+          <TextBlock Text="Используйте учётную запись администратора, оператора или курьера"
+                     Foreground="{StaticResource Muted}" FontSize="13" TextWrapping="Wrap" Margin="0,8,0,26"/>
+
+          <TextBlock Text="Логин" Foreground="{StaticResource Navy}" FontSize="13" Margin="0,0,0,6"/>
+          <TextBox x:Name="LoginBox" Height="42" FontSize="15" Padding="12,9"
+                   AutomationProperties.AutomationId="LoginInput" AutomationProperties.Name="Логин"
+                   Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,18"/>
+
+          <TextBlock Text="Пароль" Foreground="{StaticResource Navy}" FontSize="13" Margin="0,0,0,6"/>
+          <PasswordBox x:Name="PasswordBox" Height="42" FontSize="15" Padding="12,9"
+                       AutomationProperties.AutomationId="PasswordInput" AutomationProperties.Name="Пароль"
+                       KeyDown="PasswordBox_KeyDown" Margin="0,0,0,12"/>
+
+          <TextBlock Text="{Binding Message}" Foreground="#B4473F" FontSize="13" TextWrapping="Wrap"
+                     MinHeight="34" Margin="0,2,0,8" AutomationProperties.AutomationId="LoginError"/>
+
+          <Button Content="Войти" Height="46" FontSize="15" Style="{StaticResource PrimaryButton}"
+                  Click="SignIn_Click" AutomationProperties.AutomationId="SignInButton"/>
+
+          <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Margin="0,24,0,14"/>
+          <TextBlock Foreground="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" LineHeight="19">
+            <Run Text="Демо-доступы: "/>
+            <Run Text="admin / Admin@2026! · operator / Operator@2026!" FontWeight="SemiBold"/>
+            <LineBreak/>
+            <Run Text="courier1 / Courier1@2026! · courier2 / Courier2@2026!" FontWeight="SemiBold"/>
+          </TextBlock>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>
