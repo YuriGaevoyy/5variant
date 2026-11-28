@@ -30,7 +30,7 @@ public partial class App : Application
         certificate = LoopbackCertificate.Create();
         byte[] expected = certificate.GetCertHash(HashAlgorithmName.SHA256);
         host = DeliveryHost.Build([], certificate);
-        await DeliveryHost.Initialize(host);
+        await DeliveryHost.Initialize(host, desktop: true);
         await host.StartAsync();
         var transport = new HttpClientHandler
         {
@@ -77,14 +77,9 @@ public partial class App : Application
     {
         try
         {
-            if (client is not null)
-                Task.WhenAny(client, Task.Delay(1500)).GetAwaiter().GetResult();
-            if (client?.IsCompleted == true && host is not null)
-            {
-                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-                host.StopAsync(timeout.Token).GetAwaiter().GetResult();
-                host.DisposeAsync().AsTask().Wait(TimeSpan.FromSeconds(2));
-            }
+            // ASP.NET shutdown continuations must not depend on the exiting WPF dispatcher.
+            if (!Task.Run(StopClient).Wait(TimeSpan.FromSeconds(5)))
+                ClientLog.Warning("Локальный сервер не успел завершить работу.");
         }
         catch (Exception error)
         {
@@ -92,11 +87,31 @@ public partial class App : Application
         }
         finally
         {
-            http?.Dispose();
-            if (client?.IsCompleted == true)
-                certificate?.Dispose();
             ClientLog.Info("Завершение работы клиента службы доставки");
             base.OnExit(e);
+        }
+    }
+
+    private async Task StopClient()
+    {
+        if (client is not null && !client.IsCompleted)
+            await Task.WhenAny(client, Task.Delay(1500));
+        if (client?.IsCompleted != true)
+            return;
+
+        http?.Dispose();
+        try
+        {
+            if (host is not null)
+            {
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                try { await host.StopAsync(timeout.Token); }
+                finally { await host.DisposeAsync(); }
+            }
+        }
+        finally
+        {
+            certificate?.Dispose();
         }
     }
 }

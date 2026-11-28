@@ -24,15 +24,12 @@ public sealed class DeliveryStore(DeliveryDb db, TimeProvider time) : IShipmentR
         if (!string.IsNullOrWhiteSpace(search))
         {
             string term = search.Trim();
-            string upper = term.ToUpperInvariant();
-            string digits = new(term.SkipWhile(symbol => !char.IsDigit(symbol)).ToArray());
-            bool byNumber = digits.Length > 0 && int.TryParse(digits, out _);
-            query = query.Where(row => (byNumber && row.TrackingNumber.Contains(digits)) ||
-                DeliveryDatabase.DeliveryContains(row.Recipient.Name, upper) ||
-                DeliveryDatabase.DeliveryContains(row.DeliveryAddress, upper) ||
-                DeliveryDatabase.DeliveryContains(row.Description, upper) ||
+            query = query.Where(row => DeliveryDatabase.DeliveryContains(row.TrackingNumber, term) ||
+                DeliveryDatabase.DeliveryContains(row.Recipient.Name, term) ||
+                DeliveryDatabase.DeliveryContains(row.DeliveryAddress, term) ||
+                DeliveryDatabase.DeliveryContains(row.Description, term) ||
                 row.Recipient.Phone.Contains(term) ||
-                (row.Courier != null && DeliveryDatabase.DeliveryContains(row.Courier.DisplayName, upper)));
+                (row.Courier != null && DeliveryDatabase.DeliveryContains(row.Courier.DisplayName, term)));
         }
         return await query.OrderByDescending(row => row.CreatedAt).ThenByDescending(row => row.Id)
             .Select(Projection).ToListAsync(ct);

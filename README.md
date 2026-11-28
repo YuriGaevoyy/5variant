@@ -8,13 +8,16 @@
 ## Быстрый запуск
 
 1. Установите .NET 10 SDK и Visual Studio 2026 с рабочими нагрузками ASP.NET и классических приложений .NET.
-2. Откройте `DeliveryService.slnx` и нажмите F5. WPF-клиент сам поднимет локальный HTTPS API на loopback,
+2. Откройте `DeliveryService.slnx`, выберите профиль **«Служба доставки»** и нажмите **F5**.
+   Если профиль отсутствует, назначьте `DeliveryService.Desktop` запускаемым проектом.
+   WPF-клиент сам поднимет локальный HTTPS API на loopback,
    применит миграции и создаст демоданные. Откроется окно входа.
 3. Для отдельного запуска API: `dotnet dev-certs https --trust`, затем
    `dotnet user-secrets set "Jwt:Key" "<строка не короче 32 символов>" --project DeliveryService.Api`
    и `dotnet run --project DeliveryService.Api`. Swagger доступен в Development по `/swagger`.
-4. Готовый автономный ZIP: `artifacts/DeliveryService-1.0.0-win-x64.zip`. Распакуйте и запустите
-   `DeliveryService.Desktop.exe` — установка .NET не требуется.
+
+Поиск обновляется по мере ввода, а выбранный этап применяется сразу. CSV, JSON и XML выгружают
+текущую выборку отправлений. Для ручной перезагрузки списка нажмите «Обновить».
 
 ### Демо-аккаунты
 

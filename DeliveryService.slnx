@@ -9,10 +9,10 @@
     <File Path="README.md" />
     <File Path="CHANGELOG.md" />
   </Folder>
+  <Project Path="DeliveryService.Desktop/DeliveryService.Desktop.csproj" />
   <Project Path="DeliveryService.Api/DeliveryService.Api.csproj" />
   <Project Path="DeliveryService.Core/DeliveryService.Core.csproj" />
   <Project Path="DeliveryService.Data/DeliveryService.Data.csproj" />
-  <Project Path="DeliveryService.Desktop/DeliveryService.Desktop.csproj" />
   <Project Path="DeliveryService.Tests/DeliveryService.Tests.csproj" />
   <Project Path="DeliveryService.UiTests/DeliveryService.UiTests.csproj" />
 </Solution>

@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "Служба доставки",
+    "Projects": [
+      {
+        "Path": "DeliveryService.Desktop\\DeliveryService.Desktop.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

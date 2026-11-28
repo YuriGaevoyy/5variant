@@ -13,6 +13,8 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
     private int tab;
     private string search = "";
     private StatusOption? selectedFilter;
+    private CancellationTokenSource? filterRequest;
+    private int shipmentQuery;
     private ShipmentInfo? selectedShipment;
     private RecipientInfo? selectedRecipient;
     private IReadOnlyList<ShipmentInfo> shipments = [];
@@ -24,6 +26,7 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
 
     public WorkspaceViewModel()
     {
+        selectedFilter = Filters[0];
         SetTab = new Command(_ => { });
         RefreshShipments = new Command(_ => { });
         NewShipment = new Command(_ => { });
@@ -46,17 +49,25 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
         this.login = login;
         this.dialogs = dialogs;
         this.onLogout = onLogout;
+        selectedFilter = Filters[0];
 
-        SetTab = new Command(parameter => Tab = System.Convert.ToInt32(parameter, CultureInfo.InvariantCulture));
-        RefreshShipments = Run(async _ =>
+        SetTab = Run(async parameter =>
         {
-            Shipments = await api.Shipments(SelectedFilter?.Value, Search);
-            Changed(nameof(ShipmentCount));
-            if (selectedShipment is not null)
-                SelectedShipment = shipments.FirstOrDefault(row => row.Id == selectedShipment.Id);
+            Tab = System.Convert.ToInt32(parameter, CultureInfo.InvariantCulture);
+            switch (Tab)
+            {
+                case 0: await RefreshList(); break;
+                case 1 when IsStaff: await RefreshRecipientsAndCouriers(); break;
+                case 2: await RefreshStats(); break;
+                case 3 when IsAdmin: await RefreshUserList(); break;
+            }
         });
+        RefreshShipments = Run(_ => RefreshList());
         NewShipment = Run(async _ =>
         {
+            await RefreshRecipientsAndCouriers();
+            if (recipients.Count == 0)
+                throw new RuleException("Сначала добавьте получателя в разделе «Получатели».");
             var input = dialogs.EditShipment(null, recipients, couriers);
             if (input is null)
                 return;
@@ -66,12 +77,13 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
         }, () => IsStaff);
         EditShipment = Run(async _ =>
         {
-            if (selectedShipment is null)
+            if (selectedShipment is not { } selected)
                 throw new RuleException("Выберите отправление.");
-            var input = dialogs.EditShipment(selectedShipment, recipients, couriers);
+            await RefreshRecipientsAndCouriers();
+            var input = dialogs.EditShipment(selected, recipients, couriers);
             if (input is null)
                 return;
-            await api.SaveShipment(selectedShipment.Id, input with { Version = selectedShipment.Version });
+            await api.SaveShipment(selected.Id, input with { Version = selected.Version });
             Message = "Отправление обновлено.";
             await RefreshList();
         }, () => IsStaff && selectedShipment is not null);
@@ -93,7 +105,8 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
             Message = "Этап отправления обновлён.";
             await RefreshList();
             await RefreshStats();
-        }, () => selectedShipment is not null && !ShipmentRules.IsFinal(selectedShipment.Status));
+        }, () => selectedShipment is not null && ShipmentRules.Next(selectedShipment.Status)
+            .Any(status => IsStaff || status is ShipmentStatus.Delivered or ShipmentStatus.Returned));
         Export = Run(async parameter =>
         {
             string format = parameter?.ToString() ?? "csv";
@@ -101,11 +114,7 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
             dialogs.SaveExport(format, bytes);
             Message = $"Выгрузка {format.ToUpperInvariant()} сохранена.";
         }, () => IsStaff);
-        RefreshRecipients = Run(async _ =>
-        {
-            Recipients = await api.Recipients();
-            Couriers = await api.Couriers();
-        }, () => IsStaff);
+        RefreshRecipients = Run(_ => RefreshRecipientsAndCouriers(), () => IsStaff);
         NewRecipient = Run(async _ =>
         {
             var input = dialogs.EditRecipient(null);
@@ -138,16 +147,19 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
             await RefreshRecipientsList();
         }, () => IsStaff);
         RefreshStatistics = Run(async _ => await RefreshStats());
-        RefreshUsers = Run(async _ =>
-        {
-            if (IsAdmin)
-                Users = await api.Users();
-        }, () => IsAdmin);
+        RefreshUsers = Run(_ => RefreshUserList(), () => IsAdmin);
         Logout = Run(async _ =>
         {
-            await api.Logout();
-            ClientLog.Info("Выход пользователя");
-            onLogout();
+            filterRequest?.Cancel();
+            try
+            {
+                await api.Logout();
+            }
+            finally
+            {
+                ClientLog.Info("Выход пользователя");
+                onLogout();
+            }
         });
     }
 
@@ -156,11 +168,31 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
     public bool IsAdmin => login?.User.Role == Roles.Admin;
     public string SessionCaption => login is null ? "" : $"{login.User.DisplayName} · {RoleName(login.User.Role)}";
 
-    public string Search { get => search; set => Set(ref search, value); }
+    public string Search
+    {
+        get => search;
+        set
+        {
+            if (search == value)
+                return;
+            Set(ref search, value);
+            _ = RefreshFilter(delay: true);
+        }
+    }
     public IReadOnlyList<StatusOption> Filters { get; } =
         [new StatusOption("Все этапы", null), .. Enum.GetValues<ShipmentStatus>().Select(status =>
             new StatusOption(StatusNames.Russian(status), status))];
-    public StatusOption? SelectedFilter { get => selectedFilter; set => Set(ref selectedFilter, value); }
+    public StatusOption? SelectedFilter
+    {
+        get => selectedFilter;
+        set
+        {
+            if (selectedFilter == value)
+                return;
+            Set(ref selectedFilter, value);
+            _ = RefreshFilter(delay: false);
+        }
+    }
 
     public IReadOnlyList<ShipmentInfo> Shipments { get => shipments; private set => Set(ref shipments, value); }
     public ShipmentInfo? SelectedShipment { get => selectedShipment; set => Set(ref selectedShipment, value); }
@@ -193,13 +225,63 @@ internal sealed class WorkspaceViewModel : AsyncViewModel
     public ICommand RefreshUsers { get; }
     public ICommand Logout { get; }
 
-    private async Task RefreshList()
+    private async Task RefreshFilter(bool delay)
     {
-        Shipments = await api!.Shipments(SelectedFilter?.Value, Search);
+        if (api is null)
+            return;
+        shipmentQuery++;
+        filterRequest?.Cancel();
+        var request = new CancellationTokenSource();
+        filterRequest = request;
+        try
+        {
+            if (delay)
+                await Task.Delay(250, request.Token);
+            await RefreshList(request.Token);
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested)
+        {
+        }
+        catch (ClientException error)
+        {
+            if (!request.IsCancellationRequested)
+                Message = error.Message;
+        }
+        catch (Exception error)
+        {
+            ClientLog.Write(error);
+            if (!request.IsCancellationRequested)
+                Message = "Не удалось обновить список отправлений.";
+        }
+        finally
+        {
+            if (filterRequest == request)
+                filterRequest = null;
+            request.Dispose();
+        }
+    }
+
+    private async Task RefreshList(CancellationToken cancellationToken = default)
+    {
+        int query = ++shipmentQuery;
+        var result = await api!.Shipments(SelectedFilter?.Value, Search, cancellationToken);
+        if (query != shipmentQuery || cancellationToken.IsCancellationRequested)
+            return;
+        int? selectedId = selectedShipment?.Id;
+        Shipments = result;
+        SelectedShipment = result.FirstOrDefault(row => row.Id == selectedId);
         Changed(nameof(ShipmentCount));
     }
 
+    private async Task RefreshRecipientsAndCouriers()
+    {
+        Recipients = await api!.Recipients();
+        Couriers = await api.Couriers();
+    }
+
     private async Task RefreshRecipientsList() => Recipients = await api!.Recipients();
+
+    private async Task RefreshUserList() => Users = await api!.Users();
 
     private async Task RefreshStats()
     {

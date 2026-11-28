@@ -162,6 +162,9 @@ public sealed class ApiTests
             $"/api/shipments?search={Uri.EscapeDataString(created[0].Recipient)}");
         Assert.NotEmpty(searched);
         Assert.Contains(searched, row => row.Id == created[0].Id);
+        string tracking = Uri.EscapeDataString(created[0].TrackingNumber.ToLowerInvariant());
+        var exact = await Get<ShipmentInfo[]>(staff, $"/api/shipments?status=Created&search={tracking}");
+        Assert.Equal(created[0].Id, Assert.Single(exact).Id);
     }
 
     [Fact]
@@ -192,6 +195,9 @@ public sealed class ApiTests
         Assert.Contains("Number;Recipient", csv, StringComparison.Ordinal);
         Assert.Contains("\"status\"", json, StringComparison.Ordinal);
         Assert.Contains("<shipments>", xml, StringComparison.Ordinal);
+        var filtered = await Get<ShipmentInfo[]>(staff,
+            "/api/shipments/export?format=json&status=InTransit&search=DS-2026-0005");
+        Assert.Equal(ShipmentStatus.InTransit, Assert.Single(filtered).Status);
     }
 
     [Fact]
