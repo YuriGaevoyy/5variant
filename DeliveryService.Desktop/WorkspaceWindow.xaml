@@ -126,7 +126,7 @@
                 <ComboBox Width="170" Height="36" Margin="0,0,9,0" ItemsSource="{Binding Filters}"
                           SelectedItem="{Binding SelectedFilter}" DisplayMemberPath="Name"
                           AutomationProperties.AutomationId="StatusFilter" AutomationProperties.Name="Фильтр по этапу"/>
-                <Button Content="Найти" Style="{StaticResource SoftButton}" Height="36" Command="{Binding RefreshShipments}"
+                <Button Content="Обновить" Style="{StaticResource SoftButton}" Height="36" Command="{Binding RefreshShipments}"
                         AutomationProperties.AutomationId="RefreshShipmentsButton" Margin="0,0,9,0"/>
                 <Button Content="Новое отправление" Style="{StaticResource PrimaryButton}" Height="36"
                         Command="{Binding NewShipment}" AutomationProperties.AutomationId="NewShipmentButton"

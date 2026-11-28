@@ -14,7 +14,6 @@
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="*"/>
-          <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
           <Border Width="42" Height="42" CornerRadius="12" Background="{StaticResource Amber}"
@@ -50,8 +49,6 @@
           </StackPanel>
         </StackPanel>
 
-        <TextBlock Grid.Row="2" Text="Локальная версия · данные хранятся на этом компьютере"
-                   Foreground="#8FA8BD" FontSize="12"/>
       </Grid>
     </Border>
 

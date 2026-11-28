@@ -30,8 +30,10 @@ internal sealed class DeliveryClient(HttpClient http)
         }
     }
 
-    public Task<ShipmentInfo[]> Shipments(ShipmentStatus? status, string? search) =>
-        Json<ShipmentInfo[]>(HttpMethod.Get, ShipmentPath(status, search, "api/shipments"));
+    public Task<ShipmentInfo[]> Shipments(ShipmentStatus? status, string? search,
+        CancellationToken cancellationToken = default) =>
+        Json<ShipmentInfo[]>(HttpMethod.Get, ShipmentPath(status, search, "api/shipments"),
+            cancellationToken: cancellationToken);
 
     public Task<RecipientInfo[]> Recipients() => Json<RecipientInfo[]>(HttpMethod.Get, "api/recipients");
 
@@ -71,7 +73,7 @@ internal sealed class DeliveryClient(HttpClient http)
             query.Add($"search={Uri.EscapeDataString(search.Trim())}");
         if (status.HasValue)
             query.Add($"status={status.Value}");
-        return query.Count == 0 ? path : $"{path}?{string.Join('&', query)}";
+        return query.Count == 0 ? path : $"{path}{(path.Contains('?') ? '&' : '?')}{string.Join('&', query)}";
     }
 
     private async Task Send(HttpMethod method, string path, object? input = null)
@@ -79,14 +81,16 @@ internal sealed class DeliveryClient(HttpClient http)
         using var response = await Request(method, path, Content(input));
     }
 
-    private async Task<T> Json<T>(HttpMethod method, string path, object? input = null)
+    private async Task<T> Json<T>(HttpMethod method, string path, object? input = null,
+        CancellationToken cancellationToken = default)
     {
-        using var response = await Request(method, path, Content(input));
-        return await response.Content.ReadFromJsonAsync<T>(Exchange.JsonOptions) ??
+        using var response = await Request(method, path, Content(input), cancellationToken);
+        return await response.Content.ReadFromJsonAsync<T>(Exchange.JsonOptions, cancellationToken) ??
             throw new ClientException("Сервер вернул пустой ответ.");
     }
 
-    private async Task<HttpResponseMessage> Request(HttpMethod method, string path, HttpContent? content = null)
+    private async Task<HttpResponseMessage> Request(HttpMethod method, string path, HttpContent? content = null,
+        CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(method, path) { Content = content };
         if (token is not null)
@@ -95,9 +99,9 @@ internal sealed class DeliveryClient(HttpClient http)
         HttpResponseMessage response;
         try
         {
-            response = await http.SendAsync(request);
+            response = await http.SendAsync(request, cancellationToken);
         }
-        catch (TaskCanceledException error)
+        catch (TaskCanceledException error) when (!cancellationToken.IsCancellationRequested)
         {
             ClientLog.Write(error, "Тайм-аут API");
             throw new ClientException("Истекло время ожидания локального сервера. Повторите действие.");

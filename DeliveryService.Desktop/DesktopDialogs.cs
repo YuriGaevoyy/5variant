@@ -34,7 +34,7 @@ internal sealed class DesktopDialogs : IDialogService
         var grid = Fields(dialog);
         int row = 0;
 
-        var recipientValues = recipients.ToDictionary(item => item.Name, item => (int?)item.Id);
+        var recipientValues = recipients.ToDictionary(item => $"{item.Name} · {item.Phone} (№ {item.Id})", item => (int?)item.Id);
         var recipient = Combo("Получатель", recipientValues.Keys.ToArray(), recipientValues,
             current?.RecipientId, row++, "RecipientCombo");
         var description = Text("Описание", current?.Description ?? "", row++, "DescriptionInput");
@@ -44,11 +44,11 @@ internal sealed class DesktopDialogs : IDialogService
             current?.DeclaredAmount.ToString("0.00", CultureInfo.InvariantCulture) ?? "1000,00", row++, "AmountInput");
         var courierItems = new Dictionary<string, int?> { ["— не назначен —"] = null };
         foreach (var item in couriers)
-            courierItems[item.DisplayName] = item.Id;
+            courierItems[$"{item.DisplayName} ({item.Login})"] = item.Id;
         var courier = Combo("Курьер", courierItems.Keys.ToArray(), courierItems, current?.CourierId, row++, "CourierCombo");
         var notes = Text("Примечания", current?.Notes ?? "", row++, "NotesInput");
 
-        if (!Finish(dialog, grid, row))
+        if (!Finish(dialog, grid))
             return null;
         try
         {
@@ -75,7 +75,7 @@ internal sealed class DesktopDialogs : IDialogService
         var phone = Text("Телефон", current?.Phone ?? "", 1, "RecipientPhoneInput");
         var address = Text("Адрес", current?.Address ?? "", 2, "RecipientAddressInput");
         var email = Text("Эл. почта", current?.Email ?? "", 3, "RecipientEmailInput");
-        if (!Finish(dialog, grid, 4))
+        if (!Finish(dialog, grid))
             return null;
         try
         {
@@ -99,7 +99,7 @@ internal sealed class DesktopDialogs : IDialogService
         var status = Combo("Новый этап", items.Keys.ToArray(), items, null, 0, "TargetStatusCombo");
         var reason = Text("Причина возврата", "", 1, "ReturnReasonInput");
         var confirmation = Text("Подтверждение получения", current.Confirmation ?? "", 2, "ConfirmationInput");
-        if (!Finish(dialog, grid, 3))
+        if (!Finish(dialog, grid))
             return null;
         try
         {
@@ -225,7 +225,7 @@ internal sealed class DesktopDialogs : IDialogService
     [ThreadStatic]
     private static Grid? CurrentGrid;
 
-    private static bool Finish(Window dialog, Grid grid, int rows)
+    private static bool Finish(Window dialog, Grid grid)
     {
         var buttons = new StackPanel
         {
@@ -256,8 +256,6 @@ internal sealed class DesktopDialogs : IDialogService
         cancel.Click += (_, _) => dialog.DialogResult = false;
         buttons.Children.Add(ok);
         buttons.Children.Add(cancel);
-        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(46) });
-        Grid.SetRow(buttons, rows);
         grid.Children.Add(buttons);
         return dialog.ShowDialog() == true;
     }

@@ -53,9 +53,10 @@ public sealed class ShipmentsController(IShipmentRepository shipments) : Control
 
     [HttpGet("export")]
     [Authorize(Roles = Roles.Staff)]
-    public async Task<IActionResult> Export([FromQuery] string format, CancellationToken ct)
+    public async Task<IActionResult> Export([FromQuery] string format, [FromQuery] ShipmentStatus? status,
+        [FromQuery] string? search, CancellationToken ct)
     {
-        var rows = await shipments.FindShipments(SessionTokens.Current(User), null, null, ct);
+        var rows = await shipments.FindShipments(SessionTokens.Current(User), status, search, ct);
         string body = format.ToLowerInvariant() switch
         {
             "json" => Exchange.ExportJson(rows),

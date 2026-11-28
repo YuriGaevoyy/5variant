@@ -26,7 +26,8 @@ public static class DeliveryHost
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
             Args = args,
-            ApplicationName = typeof(DeliveryHost).Assembly.GetName().Name
+            ApplicationName = typeof(DeliveryHost).Assembly.GetName().Name,
+            ContentRootPath = desktopCertificate is null ? null : AppContext.BaseDirectory
         });
 
         if (desktopCertificate is not null)
@@ -49,8 +50,6 @@ public static class DeliveryHost
             throw new InvalidOperationException("Jwt:Key должен содержать не менее 32 байтов.");
 
         string path = Path.GetFullPath(builder.Configuration["Delivery:Database"] ?? DeliveryDatabase.DefaultPath);
-        bool seedDemo = builder.Configuration.GetValue<bool?>("Delivery:SeedDemo") ??
-            (desktopCertificate is not null && builder.Configuration["Delivery:Database"] is null);
         builder.Services.AddDbContext<DeliveryDb>(options => DeliveryDatabase.Configure(options, path));
         builder.Services.AddScoped<DeliveryStore>();
         builder.Services.AddScoped<IShipmentRepository>(services => services.GetRequiredService<DeliveryStore>());
@@ -154,12 +153,13 @@ public static class DeliveryHost
         return app;
     }
 
-    public static async Task Initialize(WebApplication app)
+    public static async Task Initialize(WebApplication app, bool desktop = false)
     {
         await using var scope = app.Services.CreateAsyncScope();
-        bool seed = app.Configuration.GetValue<bool?>("Delivery:SeedDemo") ?? false;
+        string? database = app.Configuration["Delivery:Database"];
+        bool seed = app.Configuration.GetValue<bool?>("Delivery:SeedDemo") ?? (desktop && database is null);
         await DeliveryDatabase.Initialize(scope.ServiceProvider.GetRequiredService<DeliveryDb>(),
-            Path.GetFullPath(app.Configuration["Delivery:Database"] ?? DeliveryDatabase.DefaultPath), seed);
+            Path.GetFullPath(database ?? DeliveryDatabase.DefaultPath), seed);
     }
 
     private static Task HandleError(HttpContext context)

@@ -64,11 +64,9 @@ public sealed class LoginAndWorkspaceTests
         WaitForCount(workspace, 9);
 
         Element(workspace, "ShipmentSearchInput").AsTextBox().Text = "несуществующий-адрес";
-        Invoke(workspace, "RefreshShipmentsButton");
         WaitForCount(workspace, 0);
 
         Element(workspace, "ShipmentSearchInput").AsTextBox().Text = "";
-        Invoke(workspace, "RefreshShipmentsButton");
         WaitForCount(workspace, 9);
     }
 
@@ -82,7 +80,6 @@ public sealed class LoginAndWorkspaceTests
         var workspace = run.Window("Служба доставки");
         WaitForCount(workspace, 3);
         Element(workspace, "StatusFilter").AsComboBox().Select("В пути");
-        Invoke(workspace, "RefreshShipmentsButton");
         WaitForCount(workspace, 1);
     }
 
@@ -168,18 +165,13 @@ public sealed class LoginAndWorkspaceTests
         public Window Window(string title)
         {
             var desktop = automation.GetDesktop();
+            AutomationElement? element = null;
             bool ready = SpinWait.SpinUntil(() =>
-            {
-                var found = desktop.FindFirstChild(cf => cf.ByAutomationId("LoginWindow"))
-                    ?? desktop.FindFirstChild(cf => cf.ByAutomationId("WorkspaceWindow"));
-                return found is not null && found.Name == title;
-            }, TimeSpan.FromSeconds(25));
+                (element = desktop.FindFirstChild(cf => cf.ByProcessId(process.Id).And(cf.ByName(title)))) is not null,
+                TimeSpan.FromSeconds(25));
             if (!ready)
                 throw new InvalidOperationException($"Окно «{title}» не открылось.");
-            var element = desktop.FindFirstChild(cf => cf.ByAutomationId("LoginWindow"))
-                ?? desktop.FindFirstChild(cf => cf.ByAutomationId("WorkspaceWindow"))
-                ?? throw new InvalidOperationException("Окно не найдено.");
-            return element.AsWindow();
+            return element!.AsWindow();
         }
 
         public void Dispose()
